@@ -79,3 +79,109 @@ Input:
 Remove Card: 10 of Diamonds
 Expected Output:
 Card removed: 10 of Diamonds
+
+
+
+
+
+
+
+CODE:
+import java.util.*;
+
+class Card {
+	private String symbol;
+	private String value;
+
+	public Card(String symbol, String value) {
+		this.symbol = symbol;
+		this.value = value;
+	}
+
+	public String getSymbol() {
+		return symbol;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	@Override
+	public String toString() {
+		return value + " of " + symbol;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null || getClass() != obj.getClass()) return false;
+		Card card = (Card) obj;
+		return symbol.equals(card.symbol) && value.equals(card.value);
+	}
+
+	@Override
+	public int hashCode() {
+		return symbol.hashCode() + value.hashCode();
+	}
+}
+class CardCollection {
+	private Set<Card> allCards;
+	private Map<String, List<Card>> cardsBySuit;
+
+	public CardCollection() {
+		allCards = new HashSet<>();
+		cardsBySuit = new HashMap<>();
+	}
+
+	public void addCard(Card card) {
+		if (allCards.contains(card)) {
+			System.out.println("Error: Card \"" + card + "\" already exists.");
+		} else {
+			allCards.add(card);
+			cardsBySuit.computeIfAbsent(card.getSymbol(), k -> new ArrayList<>()).add(card);
+			System.out.println("Card added: " + card);
+		}
+	}
+
+	public void removeCard(Card card) {
+		if (allCards.remove(card)) {
+			cardsBySuit.get(card.getSymbol()).remove(card);
+			System.out.println("Card removed: " + card);
+		} else {
+			System.out.println("Error: Card \"" + card + "\" not found.");
+		}
+	}
+
+	public void findCardsBySuit(String suit) {
+		List<Card> cards = cardsBySuit.getOrDefault(suit, Collections.emptyList());
+		if (cards.isEmpty()) {
+			System.out.println("No cards found for " + suit + ".");
+		} else {
+			cards.forEach(System.out::println);
+		}
+	}
+
+	public void displayAllCards() {
+		if (allCards.isEmpty()) {
+			System.out.println("No cards found.");
+		} else {
+			allCards.forEach(System.out::println);
+		}
+	}
+
+	public static void main(String[] args) {
+		CardCollection collection = new CardCollection();
+
+		collection.displayAllCards();
+
+		collection.addCard(new Card("Spades", "Ace"));
+		collection.addCard(new Card("Hearts", "King"));
+		collection.addCard(new Card("Diamonds", "10"));
+		collection.addCard(new Card("Clubs", "5"));
+		collection.findCardsBySuit("Hearts");
+		collection.findCardsBySuit("Diamonds");
+		collection.displayAllCards();
+		collection.addCard(new Card("Hearts", "King"));
+		collection.removeCard(new Card("Diamonds", "10"));
+	}
+}
